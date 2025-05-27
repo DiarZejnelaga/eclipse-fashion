@@ -32,7 +32,7 @@ const CountdownTimer = () => {
   const labels = { days: 'Days', hours: 'Hr', minutes: 'Mins', seconds: 'Sec' };
   return (
     <div className="pt-6 md:pt-8">
-      <h2 className="text-xl font-semibold text-gray-800 mb-3 text-center md:text-left"> Hurry, Before It's Too Late! </h2>
+      <h2 className="text-xl font-semibold text-gray-800 mb-3 text-center md:text-left"> Hurry, Before It`&apos;`s Too Late! </h2>
       <div className="flex space-x-2 sm:space-x-3 justify-center md:justify-start">
         {(Object.keys(labels) as Array<keyof typeof timeLeft>).map((key) => (
           <div key={key} className="bg-white py-2.5 px-3 sm:py-3 sm:px-3.5 rounded-md shadow-sm border border-gray-200 text-center min-w-[60px] sm:min-w-[65px]">

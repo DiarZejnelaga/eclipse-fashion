@@ -149,7 +149,7 @@ const NewArrivalsSection: React.FC = () => {
           </div>
         ) : (
           <p className="text-center text-gray-500 text-base py-8">
-            No new arrivals found in "{activeCategory}".
+            No new arrivals found in `&quot;`{activeCategory}`&quot;`.
           </p>
         )}
         <div className="mt-10 sm:mt-12 text-center">

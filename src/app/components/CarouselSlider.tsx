@@ -166,7 +166,7 @@ const TestimonialCarousel = () => {
                   <div className="text-center sm:text-left flex-grow">
                     <blockquote className="text-gray-700 mb-3 md:mb-4">
                       <p className="text-sm md:text-base lg:text-lg leading-relaxed italic">
-                        "{testimonial.text}"
+                        `&quot;`{testimonial.text}`&quot;`
                       </p>
                     </blockquote>
                     <div className="flex justify-center sm:justify-start mb-3 md:mb-4">
