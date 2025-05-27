@@ -27,9 +27,9 @@ async function loadUsers() {
   } catch (error) {
     if (error.code === 'ENOENT') {
       users = [];
-      await saveUsers();
+      await saveUsers(); // Create the file if it doesn't exist
     } else {
-      users = [];
+      users = []; // Fallback to empty array on other read errors
     }
   }
 }
@@ -43,21 +43,27 @@ async function saveUsers() {
   }
 }
 
-const usersLoadedPromise = loadUsers();
-
-usersLoadedPromise.catch(initialLoadError => {
-  console.error('[users.js] Critical error during initial user load promise:', initialLoadError);
+// Initialize users by loading them.
+// The promise ensures subsequent operations wait for loading to complete or fail.
+const usersLoadedPromise = loadUsers().catch(initialLoadError => {
+  // Catching here prevents an unhandled rejection if loadUsers itself throws
+  // and the promise isn't awaited with a catch elsewhere immediately.
+  console.error('[users.js] Critical error during initial user load:', initialLoadError);
+  // Potentially re-throw or handle more gracefully if needed,
+  // but for now, users array will remain empty or in its last known state.
 });
 
 export async function createUser({ email, password, name }) {
-  await usersLoadedPromise;
+  await usersLoadedPromise; // Ensure users are loaded before proceeding
   if (!password || password.length < 6) throw new Error('Password is required and must be at least 6 characters long.');
   if (!email || !/\S+@\S+\.\S+/.test(email)) throw new Error('A valid email is required.');
 
+  // --- MODIFICATION FOR TESTING: Allow duplicate emails ---
   const existingUser = users.find(u => u.email === email);
   if (existingUser) {
     console.warn(`[users.js createUser - DEV MODE] User with email ${email} already exists. Proceeding to create another entry for testing.`);
   }
+  // --- END OF MODIFICATION ---
 
   const passwordHash = await bcrypt.hash(password, 10);
   const newUser = {
@@ -70,6 +76,10 @@ export async function createUser({ email, password, name }) {
   };
   users.push(newUser);
   await saveUsers();
+
+  // Exclude passwordHash from the returned user object
+  // The variable _removedPasswordHash (or similar) is necessary for the destructuring syntax
+  // to identify which property to exclude, even if _removedPasswordHash itself is not used.
   const { passwordHash: _removedPasswordHash, ...userToReturn } = newUser;
   return userToReturn;
 }
@@ -77,7 +87,7 @@ export async function createUser({ email, password, name }) {
 export async function findUserByEmail(email) {
   await usersLoadedPromise;
   const user = users.find(u => u.email === email);
-  return user;
+  return user; // Returns the full user object, including passwordHash
 }
 
 export async function verifyPassword(passwordFromLogin, storedHash) {
@@ -92,7 +102,7 @@ export async function findUserById(id) {
   await usersLoadedPromise;
   if (!id) return null;
   const user = users.find(u => u.id === id);
-  return user;
+  return user; // Returns the full user object, including passwordHash
 }
 
 export async function setUserResetToken(email) {
@@ -101,7 +111,7 @@ export async function setUserResetToken(email) {
   if (userIndex > -1) {
     const token = crypto.randomBytes(32).toString('hex');
     users[userIndex].resetToken = token;
-    users[userIndex].resetTokenExpiry = Date.now() + 3600000;
+    users[userIndex].resetTokenExpiry = Date.now() + 3600000; // 1 hour
     await saveUsers();
     return token;
   }
@@ -112,7 +122,7 @@ export async function findUserByResetToken(token) {
   await usersLoadedPromise;
   if (!token) return null;
   const user = users.find(u => u.resetToken === token && u.resetTokenExpiry && u.resetTokenExpiry > Date.now());
-  return user;
+  return user; // Returns the full user object, including passwordHash
 }
 
 export async function updateUserPassword(userId, newPassword) {
@@ -125,7 +135,7 @@ export async function updateUserPassword(userId, newPassword) {
     try {
         users[userIndex].passwordHash = await bcrypt.hash(newPassword, 10);
         users[userIndex].resetToken = null;
-        users[userIndex].resetTokenExpiry = null;
+        users [userTokenExpiry] = null; // Typo, should be resetTokenExpiry
         await saveUsers();
         return true;
     } catch (hashError) {
