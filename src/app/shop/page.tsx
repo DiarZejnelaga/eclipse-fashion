@@ -219,7 +219,7 @@ export default function ShopPage() {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 9;
-  const priceRangeOptions: PriceRange[] = [ { label: "$0-$50", min: 0, max: 50 }, { label: "$50-$100", min: 50, max: 100 }, { label: "$100-$150", min: 100, max: 150 }, { label: "$150-$200", min: 150, max: 200 }, { label: "$200-$400", min: 200, max: 400 }, ];
+  const priceRangeOptions: PriceRange[] = useMemo(() => [ { label: "$0-$50", min: 0, max: 50 }, { label: "$50-$100", min: 50, max: 100 }, { label: "$100-$150", min: 100, max: 150 }, { label: "$150-$200", min: 150, max: 200 }, { label: "$200-$400", min: 200, max: 400 }, ], []);
   const allAvailableFilterColors = useMemo(() => Array.from(new Set(productsData.flatMap(p => p.allColors))).sort(), []);
   const allAvailableBrands = useMemo(() => Array.from(new Set(productsData.map(p => p.brand))).sort(), []);
   const allAvailableSizes = useMemo(() => Array.from(new Set(productsData.flatMap(p => p.sizes || []))).sort((a,b) => ['S','M','L','XL'].indexOf(a) - ['S','M','L','XL'].indexOf(b)), []);
