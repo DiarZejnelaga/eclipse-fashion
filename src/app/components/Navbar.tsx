@@ -1,10 +1,11 @@
-// src/components/Navbar.tsx
+// src/app/components/Navbar.tsx
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, MouseEvent, useEffect } from 'react';
-import { useCart } from '../context/cartContext'; 
+import { useCart } from '../context/cartContext';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
@@ -22,23 +23,19 @@ export default function Navbar() {
       openCart = cart.openCart;
       cartItemCount = cart.cartItemCount;
     }
-  } catch (error) {
-  }
+  } catch {}
   const { user, logout, loading: authLoading } = useAuth();
 
   const handleLogout = async () => {
     await logout();
   };
 
-  // Calculate user initial (NEW)
   const userInitial = user?.name
     ? user.name.charAt(0).toUpperCase()
     : user?.email
     ? user.email.charAt(0).toUpperCase()
     : '?';
-  // --- End Auth Logic ---
 
-  // --- Original useEffects and Event Handlers ---
   useEffect(() => {
     setIsClient(true);
     if (typeof window !== 'undefined') {
@@ -52,31 +49,27 @@ export default function Navbar() {
         setCurrentHash(window.location.hash);
       }
     };
+
     if (isClient) {
       setCurrentHash(window.location.hash);
+      window.addEventListener('hashchange', handleHashChange);
+      return () => {
+        window.removeEventListener('hashchange', handleHashChange);
+      };
     }
-    window.addEventListener('hashchange', handleHashChange);
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-    };
   }, [pathname, isClient]);
 
   const handleHomepageScrollLinkClick = (event: MouseEvent<HTMLAnchorElement>, sectionId: string) => {
     event.preventDefault();
-    // console.log(`[Navbar] Clicked scroll link for section: ${sectionId}. Current path: ${pathname}`);
     if (pathname === '/') {
-    //   console.log(`[Navbar] Already on '/'. Scrolling to ${sectionId}`);
       const section = document.getElementById(sectionId);
       if (section) {
         const navbarHeight = document.querySelector('header')?.offsetHeight || 64;
         const sectionTop = section.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
         window.scrollTo({ top: sectionTop, behavior: 'smooth' });
-      } else {
-        // console.warn(`[Navbar] Section '${sectionId}' not found on homepage for direct scroll.`);
       }
     } else {
       const targetUrl = `/?scrollTo=${sectionId}`;
-    //   console.log(`[Navbar] Navigating to: ${targetUrl}`);
       router.push(targetUrl);
     }
   };
@@ -94,7 +87,6 @@ export default function Navbar() {
     }
     return `text-sm hover:text-black ${isActive ? 'text-black font-semibold' : 'text-gray-700'}`;
   };
-  // --- End Original useEffects and Event Handlers ---
 
   return (
     <header className="bg-white py-4 fixed top-0 left-0 w-full z-50 shadow-sm">
@@ -102,7 +94,6 @@ export default function Navbar() {
         <Link href="/" className="text-2xl font-bold text-gray-800 lowercase">eclipse</Link>
 
         <div className="flex items-center space-x-6 md:space-x-10">
-          {/* Original Main Navigation */}
           <nav className="hidden md:block">
             <ul className="flex space-x-5 lg:space-x-6">
               <li key="Home">
@@ -142,21 +133,28 @@ export default function Navbar() {
               </li>
             </ul>
           </nav>
-          {/* End Original Main Navigation */}
-
-          {/* Original Action Icons Area */}
           <div className="flex items-center space-x-4 md:space-x-6">
-            {/* Search Button (original) */}
             <div className="relative flex items-center">
               <button onClick={() => setShowSearch(!showSearch)} className="p-1" aria-label="Toggle search">
-                <img src="/icons/search.svg" alt="Search" className="h-4 w-4 hover:scale-110 transition-transform" />
+                <Image
+                  src="/icons/search.svg"
+                  alt="Search"
+                  width={16}
+                  height={16}
+                  className="hover:scale-110 transition-transform"
+                />
               </button>
               <input type="text" placeholder="Search..." className={searchInputClasses} />
             </div>
 
-            {/* Cart Button (original) */}
             <button onClick={openCart} aria-label="Open shopping cart" className="relative p-1">
-              <img src="/icons/cart.svg" alt="Cart" className="h-4 w-4 hover:scale-110 transition-transform" />
+              <Image
+                src="/icons/cart.svg"
+                alt="Cart"
+                width={16}
+                height={16}
+                className="hover:scale-110 transition-transform"
+              />
               {isClient && cartItemCount > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-mono leading-none">
                   {cartItemCount}
@@ -164,16 +162,15 @@ export default function Navbar() {
               )}
             </button>
 
-            {/* --- MODIFIED: Conditional User Icon / Login Link --- */}
             {authLoading ? (
-              <div className="p-1 flex items-center justify-center w-7 h-7"> {/* Ensure consistent sizing with button */}
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-500 border-t-transparent"></div> {/* Simple spinner */}
+              <div className="p-1 flex items-center justify-center w-7 h-7">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-500 border-t-transparent"></div>
               </div>
             ) : user ? (
               <div className="relative group">
                 <button
                   aria-label="User account options"
-                  className="w-7 h-7 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-sm font-semibold text-white focus:outline-none ring-1 ring-offset-1 ring-offset-white ring-gray-500" // Adjusted size to w-7 h-7
+                  className="w-7 h-7 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-sm font-semibold text-white focus:outline-none ring-1 ring-offset-1 ring-offset-white ring-gray-500"
                 >
                   {userInitial}
                 </button>
@@ -185,7 +182,7 @@ export default function Navbar() {
                     <p className="text-sm font-medium text-gray-900 truncate">{user.name || user.email}</p>
                   </div>
                   <div className="border-t border-gray-100"></div>
-                 
+
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -196,13 +193,16 @@ export default function Navbar() {
               </div>
             ) : (
               <Link href="/login" className="p-1" aria-label="Login">
-                <img src="/icons/login.svg" alt="Login" className="h-4 w-4 hover:scale-110 transition-transform" />
+                <Image
+                  src="/icons/login.svg"
+                  alt="Login"
+                  width={16}
+                  height={16}
+                  className="hover:scale-110 transition-transform"
+                />
               </Link>
             )}
-            {/* --- END MODIFIED SECTION --- */}
-
           </div>
-          {/* End Original Action Icons Area */}
         </div>
       </div>
     </header>

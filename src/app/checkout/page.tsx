@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -102,7 +102,7 @@ export default function CheckoutPage() {
   const [postalCode, setPostalCode] = useState('');
   const [saveDeliveryInfo, setSaveDeliveryInfo] = useState(false);
 
-  const [paymentMethod, setPaymentMethod] = useState('creditCard');
+  const paymentMethod = 'creditCard';
   const [selectedCardTypeId, setSelectedCardTypeId] = useState<string | null>(
     cardTypesData.length > 0 ? cardTypesData[0].id : null
   );
