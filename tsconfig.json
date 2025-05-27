@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "es5", // Or a newer target like ES2017, ES2020
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
+    "forceConsistentCasingInFileNames": true, // Good practice
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "bundler", // Recommended for modern Node/TS
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -18,10 +19,21 @@
         "name": "next"
       }
     ],
+    // --- PATH ALIAS CONFIGURATION ---
+    "baseUrl": "./src", // Sets the base for module resolution to the 'src' directory
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["*"]   // Maps '@/' to 'src/'. So '@/data/products' becomes 'src/data/products'
+                     // An alternative that also works if baseUrl is ".": "@/*": ["./src/*"]
     }
+    // --- END PATH ALIAS CONFIGURATION ---
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "src/**/*.ts",    // Includes all .ts files in src
+    "src/**/*.tsx",   // Includes all .tsx files in src
+    "src/**/*.js",    // Includes .js files in src (for your products.js)
+    "src/**/*.jsx",   // Includes .jsx files in src (if any)
+    ".next/types/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }
