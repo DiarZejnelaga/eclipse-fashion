@@ -2,7 +2,7 @@
 import { getIronSession } from 'iron-session';
 import { cookies } from 'next/headers';
 import { sessionOptions } from '@/app/lib/session';
-export async function POST(request) {
+export async function POST(_request) {
   try {
     const session = await getIronSession(cookies(), sessionOptions);
     session.destroy();
