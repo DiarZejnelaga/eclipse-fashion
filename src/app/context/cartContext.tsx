@@ -2,12 +2,10 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useMemo } from 'react';
-// Ensure this path is correct and these types are exported from your products data file
-import { Product, ProductImage, productsData as allProductsFromSource } from '../data/products';
+import { Product } from '../data/products';
 
-// Define the shape of an item in the cart, extending Product
 export interface CartContextItem extends Product {
-  cartItemId: string; // Unique ID for this specific cart entry
+  cartItemId: string;
   quantity: number;
   selectedSize: string | null;
   selectedColorHex: string | null;
@@ -20,16 +18,16 @@ interface CartContextType {
   openCart: () => void;
   closeCart: () => void;
   addToCart: (
-    product: Product, // Pass the full Product object from the Product Detail Page
+    product: Product,
     quantity: number,
     selectedSize: string | null,
     selectedColorHex: string | null,
-    selectedImageUrl: string // Explicitly pass the selected image URL
+    selectedImageUrl: string
   ) => void;
   updateQuantity: (cartItemId: string, newQuantity: number) => void;
   removeItem: (cartItemId: string) => void;
-  clearCart: () => void; // Added for completeness
-  cartItemCount: number; // Total quantity of all items
+  clearCart: () => void;
+  cartItemCount: number;
   subtotal: number;
 }
 
@@ -39,7 +37,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartContextItem[]>([]);
 
-  // Load cart from localStorage on initial mount
   useEffect(() => {
     try {
       const storedCart = localStorage.getItem('fascoShoppingCart');
@@ -48,12 +45,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (error) {
       console.error("Failed to load cart from localStorage:", error);
-      // Optionally clear corrupted cart data
-      // localStorage.removeItem('fascoShoppingCart');
     }
   }, []);
 
-  // Save cart to localStorage whenever it changes
   useEffect(() => {
     try {
       localStorage.setItem('fascoShoppingCart', JSON.stringify(cartItems));
@@ -72,11 +66,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const addToCart = useCallback(
     (
-      productToAdd: Product, // The product object being added
+      productToAdd: Product,
       quantity: number,
       selectedSize: string | null,
       selectedColorHex: string | null,
-      selectedImageUrl: string // Must be provided
+      selectedImageUrl: string
     ) => {
       const cartItemId = generateCartItemId(productToAdd.id, selectedSize, selectedColorHex);
 
@@ -84,7 +78,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         const existingItemIndex = prevItems.findIndex(item => item.cartItemId === cartItemId);
 
         if (existingItemIndex > -1) {
-          // Item already exists, update quantity
           const updatedItems = prevItems.map((item, index) =>
             index === existingItemIndex
               ? { ...item, quantity: item.quantity + quantity }
@@ -92,20 +85,18 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           );
           return updatedItems;
         } else {
-          // Add new item. We use productToAdd directly.
-          // No need to re-fetch from allProductsFromSource if productToAdd is already complete.
           const newCartItem: CartContextItem = {
-            ...productToAdd, // Spread all properties from the product object
+            ...productToAdd,
             cartItemId,
             quantity,
             selectedSize,
             selectedColorHex,
-            selectedImageUrl, // Use the image URL passed from PDP
+            selectedImageUrl,
           };
           return [...prevItems, newCartItem];
         }
       });
-      openCart(); // Open cart when item is added
+      openCart();
     },
     [openCart]
   );
@@ -116,10 +107,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         prevItems
           .map(item =>
             item.cartItemId === cartItemId
-              ? { ...item, quantity: Math.max(0, newQuantity) } // Ensure quantity doesn't go below 0
+              ? { ...item, quantity: Math.max(0, newQuantity) }
               : item
           )
-          .filter(item => item.quantity > 0) // Remove item if quantity becomes 0
+          .filter(item => item.quantity > 0)
       );
     },
     []
