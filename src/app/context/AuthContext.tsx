@@ -2,12 +2,30 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
+// Define User interface
 interface User {
   id: string;
   email: string;
   name?: string;
 }
 
+// Define API response interfaces for better type safety
+interface LoginApiResponse {
+  user?: User;
+  message?: string;
+}
+
+interface RegisterApiResponse {
+  user?: { id: string; /* other user fields if API returns them */ };
+  userId?: string; // If API might send userId directly
+  message?: string;
+}
+
+interface PasswordResetApiResponse {
+  message?: string;
+}
+
+// Define AuthContextType
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<{ success: boolean; user?: User; message: string }>;
@@ -25,12 +43,30 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+// Helper function to safely get an error message
+function getErrorMessage(error: unknown, defaultMessage: string): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === 'string' && error.trim() !== '') {
+    return error;
+  }
+  // Add more specific checks if your API errors have a known structure, e.g.:
+  // if (typeof error === 'object' && error !== null && 'message' in error && typeof (error as any).message === 'string') {
+  //   return (error as any).message;
+  // }
+  return defaultMessage;
+}
+
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
 
   const checkUserSession = useCallback(async (calledFrom = "unknown") => {
+    // In a real app, this would check for a session/token and validate it.
+    // For now, it's a placeholder.
+    // console.log(`checkUserSession called from: ${calledFrom}`);
     if (calledFrom === "initial load") {
       setUser(null);
       setInitialLoading(false);
@@ -49,17 +85,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
+      const data = await res.json() as LoginApiResponse;
       if (res.ok && data.user) {
-        setUser(data.user as User);
-        return { success: true, user: data.user as User, message: data.message || 'Login successful!' };
+        setUser(data.user); // Assuming data.user directly matches User interface
+        return { success: true, user: data.user, message: data.message || 'Login successful!' };
       } else {
         setUser(null);
         return { success: false, message: data.message || 'Login failed' };
       }
-    } catch (error: any) {
+    } catch (error: unknown) { // Fix: Use unknown type for error
       setUser(null);
-      return { success: false, message: error.message || 'An unexpected error occurred during login.' };
+      const message = getErrorMessage(error, 'An unexpected error occurred during login.');
+      return { success: false, message };
     } finally {
       setLoading(false);
     }
@@ -68,9 +105,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = async (): Promise<void> => {
     setLoading(true);
     try {
+      // Placeholder: If actual API call, e.g., await fetch('/api/auth/logout', { method: 'POST' });
       setUser(null);
-    } catch (error: any) {
-      console.error(error.message);
+    } catch (error: unknown) { // Fix: Use unknown type for error
+      // This catch is more relevant if there's an API call in the try block
+      console.error("Logout error:", getErrorMessage(error, "An unexpected error occurred during logout."));
     } finally {
       setLoading(false);
     }
@@ -84,16 +123,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, name }),
       });
-      const data = await res.json();
+      const data = await res.json() as RegisterApiResponse;
       if (res.ok && data.user && data.user.id) {
         return { success: true, userId: data.user.id, message: data.message || 'Registration successful!' };
-      } else if (res.ok && data.userId) {
+      } else if (res.ok && data.userId) { // Handle if API sends userId directly
         return { success: true, userId: data.userId, message: data.message || 'Registration successful!' };
-      } else {
+      }
+      else {
         return { success: false, message: data.message || 'Registration failed' };
       }
-    } catch (error: any) {
-      return { success: false, message: error.message || 'An unexpected error occurred during registration.' };
+    } catch (error: unknown) { // Fix: Use unknown type for error
+      const message = getErrorMessage(error, 'An unexpected error occurred during registration.');
+      return { success: false, message };
     } finally {
       setLoading(false);
     }
@@ -107,13 +148,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-      const data = await res.json();
+      const data = await res.json() as PasswordResetApiResponse;
       if (res.ok) {
         return { success: true, message: data.message || 'If an account with that email exists, a password reset link has been sent.' };
       } else {
-        return { success: false, message: data.message || 'If an account with that email exists, a password reset link has been sent.' };
+        return { success: false, message: data.message || 'Failed to request password reset. Please try again.' };
       }
-    } catch (error: any) {
+    } catch (error: unknown) { // Fix: Use unknown type for error
+      // Fix: Use the error variable, e.g., by logging it
+      console.error("Password reset request error:", getErrorMessage(error, "Details unavailable."));
       return { success: false, message: 'An unexpected error occurred. Please try again.' };
     } finally {
       setLoading(false);

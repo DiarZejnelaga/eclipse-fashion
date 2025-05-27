@@ -1,7 +1,7 @@
 // app/cart/page.tsx
 'use client';
 
-import React, { useState } from 'react'; // Added useState for giftWrap
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '../context/cartContext';
@@ -14,13 +14,12 @@ import NewsletterSection from '../components/Newsletter'; // Adjust path
 import { useRouter } from 'next/navigation';
 
 export default function CartPage() {
-    const router = useRouter();
+  const router = useRouter();
   const {
     cartItems,
     updateQuantity,
     removeItem,
     subtotal,
-    cartItemCount
   } = useCart();
 
   const [giftWrap, setGiftWrap] = useState(false);
@@ -35,8 +34,7 @@ export default function CartPage() {
   return (
     <>
       <Navbar />
-      <main className="container mx-auto px-4 py-8 pt-24 md:pt-28"> {/* Adjusted top padding */}
-        {/* Header Section */}
+      <main className="container mx-auto px-4 py-8 pt-24 md:pt-28">
         <div className="mb-6 md:mb-8">
           <nav className="text-xs text-gray-500 mb-2" aria-label="Breadcrumb">
             <ol className="list-none p-0 inline-flex">
@@ -63,9 +61,7 @@ export default function CartPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
-            {/* Cart Items - Left Side / Top on mobile */}
             <div className="lg:col-span-2 bg-white shadow rounded-lg p-6">
-              {/* Desktop Headers */}
               <div className="hidden md:grid md:grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 items-center pb-3 border-b mb-4 text-xs text-gray-500 uppercase font-medium">
                 <span>Product</span>
                 <span className="text-right">Price</span>
@@ -161,13 +157,13 @@ export default function CartPage() {
                 </div>
 
                 <button
-                  onClick={() => { alert('Proceeding to Checkout!'); /* router.push('/checkout'); */ }}
+                  onClick={handleProceedToCheckout} // Fix 2: Changed to call the defined function
                   className="mt-6 w-full bg-black text-white py-3 px-6 rounded font-semibold text-sm uppercase tracking-wider hover:bg-gray-800 transition-colors"
                 >
                   Checkout
                 </button>
                 <Link href="/shop" className="block w-full text-center mt-3 text-sm text-indigo-600 hover:underline">
-                  View Cart {/* Or "Continue Shopping" */}
+                  Continue Shopping {/* Changed text for clarity, original was "View Cart" which is less fitting here */}
                 </Link>
               </div>
                <Link href="/shop" className="hidden lg:block w-full text-center mt-4 text-sm text-indigo-600 hover:underline">
