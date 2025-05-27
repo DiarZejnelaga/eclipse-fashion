@@ -1,16 +1,24 @@
 
-import { withIronSessionApiRoute } from 'next-iron-session';
-import { sessionOptions } from '@/app/lib/session'; 
-
-async function logoutRoute(req, res) {
+import { getIronSession } from 'iron-session';
+import { cookies } from 'next/headers';
+import { sessionOptions } from '@/lib/session'; 
+export async function POST(request) { 
   try {
-    req.session.destroy();
-    res.status(200).json({ message: 'Logout successful' });
+    const session = await getIronSession(cookies(), sessionOptions);
+
+    session.destroy();
+
+
+    return new Response(JSON.stringify({ message: 'Logout successful' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
-    console.error('[Logout] Error:', error);
+    console.error('[Logout Route Handler] Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    res.status(500).json({ message: 'Internal Server Error', error: errorMessage });
+    return new Response(JSON.stringify({ message: 'Internal Server Error', error: errorMessage }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
-
-export default withIronSessionApiRoute(logoutRoute, sessionOptions);
