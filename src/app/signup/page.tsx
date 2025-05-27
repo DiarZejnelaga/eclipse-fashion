@@ -242,7 +242,7 @@ export default function SignupPage() {
             </div>
 
             <div className="pt-3 text-xs text-gray-500">
-                By clicking "ACCEPT AND CONTINUE", I confirm that I have read and
+                By clicking `&quot;`ACCEPT AND CONTINUE`&quot;`, I confirm that I have read and
                 accept the <Link href="/terms-and-conditions" className="font-medium text-gray-700 hover:text-gray-900">Terms and Conditions of use and purchase</Link>, and I
                 understand the information on the use of my personal data provided in the <Link href="/privacy-policy" className="font-medium text-gray-700 hover:text-gray-900">Privacy Policy</Link>.
             </div>
