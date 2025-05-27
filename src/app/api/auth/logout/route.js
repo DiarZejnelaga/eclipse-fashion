@@ -1,14 +1,11 @@
 
 import { getIronSession } from 'iron-session';
 import { cookies } from 'next/headers';
-import { sessionOptions } from '@/lib/session'; 
-export async function POST(request) { 
+import { sessionOptions } from '../../../../lib/session.js';
+export async function POST(request) {
   try {
     const session = await getIronSession(cookies(), sessionOptions);
-
     session.destroy();
-
-
     return new Response(JSON.stringify({ message: 'Logout successful' }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
