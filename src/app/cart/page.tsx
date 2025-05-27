@@ -56,7 +56,7 @@ export default function CartPage() {
           <div className="text-center py-16 bg-white shadow rounded-lg">
             <svg className="w-20 h-20 text-gray-300 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
             <h2 className="text-xl font-semibold text-gray-700 mb-2">Your Cart is Currently Empty</h2>
-            <p className="text-gray-500 mb-6">Looks like you haven't added anything to your cart yet.</p>
+            <p className="text-gray-500 mb-6">Looks like you havent added anything to your cart yet.</p>
             <Link href="/shop" className="bg-gray-800 text-white py-2.5 px-6 rounded text-sm font-medium hover:bg-gray-700 transition-colors">
               Return To Shop
             </Link>
@@ -166,10 +166,6 @@ export default function CartPage() {
                 >
                   Checkout
                 </button>
-                 {/* The PNG shows "View Cart" here, which is a bit redundant on the cart page itself.
-                     Usually, it would be "Continue Shopping" or similar.
-                     For now, replicating the PNG's "View Cart" but linking to shop.
-                 */}
                 <Link href="/shop" className="block w-full text-center mt-3 text-sm text-indigo-600 hover:underline">
                   View Cart {/* Or "Continue Shopping" */}
                 </Link>

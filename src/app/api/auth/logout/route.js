@@ -1,14 +1,13 @@
+import { withSessionRoute } from "@/app/lib/session";
 
-import { NextResponse } from 'next/server';
-export async function POST(request) {
-  console.log('[App Router POST /api/auth/logout] Hit!');
+async function logoutRoute(req, res) {
   try {
-
-    console.warn('IRON-SESSION TODO: Actual session destruction & cookie clearing for App Router needed in /api/auth/logout/route.js');
-    return NextResponse.json({ message: 'Logout successful (Session not yet implemented)' });
-
+    req.session.destroy(); 
+    res.status(200).json({ message: 'Logout successful' });
   } catch (error) {
-    console.error('[App Router POST /api/auth/logout] ERROR:', error.message, error.stack);
-    return NextResponse.json({ message: 'An internal server error occurred.' }, { status: 500 });
+    console.error('[Logout] Error:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 }
+
+export default withSessionRoute(logoutRoute);

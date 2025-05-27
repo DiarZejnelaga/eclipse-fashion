@@ -1,15 +1,25 @@
-
 import { NextResponse } from 'next/server';
+import { getIronSession } from 'iron-session/edge';
+import { sessionOptions } from '@/app/lib/session';
 
 export async function GET(request) {
   console.log('[App Router GET /api/auth/me] Hit!');
   try {
+    const session = await getIronSession(request, sessionOptions);
 
-    console.warn('IRON-SESSION TODO: Actual session reading logic for App Router needed in /api/auth/me/route.js');
-    return NextResponse.json({ user: null, message: 'Not authenticated (Session not yet implemented)' }, { status: 401 });
+    if (!session.user) {
+      return NextResponse.json(
+        { user: null, message: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
 
+    return NextResponse.json({ user: session.user });
   } catch (error) {
     console.error('[App Router GET /api/auth/me] ERROR:', error.message, error.stack);
-    return NextResponse.json({ message: 'An internal server error occurred.' }, { status: 500 });
+    return NextResponse.json(
+      { message: 'An internal server error occurred.' },
+      { status: 500 }
+    );
   }
 }
