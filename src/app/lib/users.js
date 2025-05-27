@@ -70,7 +70,7 @@ export async function createUser({ email, password, name }) {
   };
   users.push(newUser);
   await saveUsers();
-  const { passwordHash: removedPasswordHash, ...userToReturn } = newUser;
+  const { passwordHash: _removedPasswordHash, ...userToReturn } = newUser;
   return userToReturn;
 }
 
