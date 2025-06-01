@@ -1,4 +1,3 @@
-// src/app/api/auth/signup/route.js
 import { NextResponse } from 'next/server';
 import { createUser } from '@/app/lib/users'; // Make sure path is correct
 import { sendWelcomeEmail } from '@/app/lib/nodemailer';
@@ -34,19 +33,17 @@ export async function POST(request) {
       name: name || email.split('@')[0],
     });
 
-   // Send welcome email (async, no await)
-sendWelcomeEmail(createdUser.email, createdUser.name)
-  .then((emailRes) => {
-    if (emailRes.success) {
-      console.log(`[Signup] Welcome email sent to ${createdUser.email}`);
-    } else {
-      console.error(`[Signup] Failed to send welcome email to ${createdUser.email}`);
+    // ✅ FIX: Use await instead of .then/.catch so Vercel waits for email to send
+    try {
+      const emailRes = await sendWelcomeEmail(createdUser.email, createdUser.name);
+      if (emailRes.success) {
+        console.log(`[Signup] Welcome email sent to ${createdUser.email}`);
+      } else {
+        console.error(`[Signup] Failed to send welcome email to ${createdUser.email}`);
+      }
+    } catch (error) {
+      console.error(`[Signup] Error sending welcome email:`, error);
     }
-  })
-  .catch((error) => {
-    console.error(`[Signup] Error sending welcome email:`, error);
-  });
-
 
     return NextResponse.json(
       { user: createdUser, message: 'Signup successful! A welcome email has been sent.' },
